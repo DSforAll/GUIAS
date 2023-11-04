@@ -1,0 +1,79 @@
+
+############################# INSTALACION ############################
+
+-> https://docs.docker.com/engine/install/ubuntu/
+sudo apt-get remove docker docker-engine docker.io containerd runc
+
+sudo apt-get -y install apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt update
+apt-cache policy docker-ce
+
+# Install Docker, you can ignore the warning from Docker about using WSL
+sudo apt install docker-ce
+
+sudo systemctl status docker
+
+# Add your user to the Docker group
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Install Docker Compose v2
+sudo apt-get update && sudo apt-get install docker-compose-plugin
+
+# Using Ubuntu 22.04 or Debian 10 / 11? You need to do 1 extra step for iptables
+# compatibility, you'll want to choose option (1) from the prompt to use iptables-legacy.
+sudo update-alternatives --config iptables
+------------------------------------------------------------------------------------------
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+      && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+      && curl -s -L https://nvidia.github.io/libnvidia-container/experimental/$distribution/libnvidia-container.list | \
+         sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+         sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+sudo apt-get update
+sudo apt-get install -y nvidia-docker2
+sudo systemctl restart docker
+
+
+############################# DOCKERFILE ############################
+
+
+sudo systemctl restart docker    --> para reiniciar el demonio de docker
+sudo service docker start	 --> para iniciar el demonio de docker
+sudo service docker stop         --> para para el demonio de docker
+
+
+
+############################# DOCKERFILE ############################
+example
+FROM tensorflow/tensorflow:lastet-gpu
+
+WORKDIR /tf-knugs
+
+COPY requirements.txt requirements.txt
+
+RUN pip install -r requirements.txt
+
+EXPOSE 8888
+
+############################# DOCKERCOMPOSE ############################
+
+version: '1.0'
+services:
+ jupyter-lab:
+  build:.
+  ports:
+   - 8888:8888
+  volumes:
+   - /tf-knugs:/tf-knugs
+  deploy:
+   resources:
+    reservation:
+     devices:
+      - driver: nvidia
+      count:1
+      capabilities: [gpu]
