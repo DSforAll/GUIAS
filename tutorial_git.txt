@@ -1,0 +1,111 @@
+git --version 
+
+git help
+
+git config --global user.name "xxxx"
+git config --global user.email "xxxxx" 
+git config --global init.defaultBranch main
+git config --global credential.helper store   # acordase de añadir .git-credentials all gitignore
+
+git config --global alias.lg "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all"
+git config --global alias.s status --short
+git config --global pull.ff only
+git config --global pull.rebase true
+
+git config --global -e  --------------> si queremos modificar el archivo de configuración global
+
+
+
+git init                --------------> estructura inicial de git       
+git config core.autocrlf true
+git status              --------------> ver estado de segimiento de git
+
+git add .               --------------> añade los archivos para seguimineto
+git add *.hhml          --------------> añade todos los archivos html a stage
+git add /css            --------------> añade todos archivos y subcarpetas de la carpeta css al stage
+git reset .             --------------> elemina los archivos del seguimiento
+
+git commit -m "version" --------------> hace una foto de los archivos a los que hacemos seguimiento
+
+git checkout -- .       --------------> reconstruye el proyecto a como estaba en el ultimo commit
+
+git branch              --------------> nos muestra en la rama en la que estamos trabajando
+++++ siempre es buena practica en la rama master solo vayan las cosas a produccion  y trabajemos en otras ramas++++
+
+git commit -am "mensaje" -------------> si queremos hacer el add y el commit en un solo paso >>>> preferible hacerlo por separado
+
+git log                 --------------> para ver todos los logs
+
+.gitkeep                --------------> creamos un archivo con esta extensión dentro de una carpeta vacia para que git pueda hacer seguimiento de ella aunque no haya nada dentro
+
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+
+git commit --amend -m "mensaje" ----------> cambia el mesaje del commit actual por si me equivoco
+
+
+### viajes en el tiempo ###
+
+git reset --soft <hash>
+git reset --mixed <hash>
+git reset --hard <hash>
+
+
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+
+git branch nombre_rama   ------------> crea una nueva rama
+git checkout nombre_rama ------------> nos mueve a la rama especificada
+
+git checkout -b nombre_rama ------------> crea una nueva rama y nos mueve a ella
+
+para unir varias ramas debo de estar situado en la rama a la que voy ha añadirle la rama que queramos
+por ejemplo si quiero unir rama ejemplo como rama master y llevarme la rama ejemplo a la rama master
+primero debo moverme a la rama master y luego unirlas
+
+git merge nombre_rama_que_queremos_unir_a_la_que_estamos
+
+git branch -d nombre_rama -----------> para eliminar una rama
+
+
+git tag nombre_tag   ----------------> para añadir la version del programa
+git tag -a v1.0.0 -m  "mensaje" -----> añadir el tag y el mensaje a la vez
+git tag -a v1.0.0 <hash> ------------> añadir el tag en el commit del hash que inidicamos
+
+
+
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+
+
+                                            GITHUB
+
+git remote add origin urlgithub.git --------> para añadir al stage un repositorio de github
+
+git remote -v                                           --------> para chequear los remotos que tenemos
+git push -u origin nombre_rama                          --------> para hacer un push al repositoiro en la rama master
+git push --tags   
+git pull origin main                                    --------> para subir los tags
+git push                                                --------> sube los cambios al repo de github
+
+
+
+PASOS INICIALES PARA CONECTARSE A IGTHUB
+git pull origin main
+git checkout -b <rama>
+git push -u origin <rama>
+
+git push -f origin am:desa
+
+git clone --single-branch --depth 1 -b amoreno urlgithub.git .
+
+
+
+
+
+
+
+
