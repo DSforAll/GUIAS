@@ -100,7 +100,7 @@ git push -u origin <rama>
 
 git push -f origin am:desa
 
-git clone --single-branch --depth 1 -b amoreno urlgithub.git .
+git clone --single-branch --depth 1 -b am urlgithub.git .
 
 
 
