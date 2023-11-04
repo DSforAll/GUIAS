@@ -1,0 +1,223 @@
+############################# LINKS ############################
+@referencias
+habilitar subsitema de windows para linux y plataforma de máquina virtual
+https://www.youtube.com/watch?v=exUMlNshRAs
+https://joe.blog.freemansoft.com/2022/01/setting-your-memory-and-swap-for-wsl2.html
+https://www.youtube.com/watch?v=YozfiLI1ogY
+https://www.youtube.com/watch?v=Hq8ocpy3l5w
+https://learn.microsoft.com/en-us/windows/wsl/install-manual
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#install-guide
+https://www.youtube.com/watch?v=SDk3pqFXgs8
+https://nickjanetakis.com/blog/install-docker-in-wsl-2-without-docker-desktop
+https://betterprogramming.pub/how-to-install-docker-without-docker-desktop-on-windows-a2bbb65638a1
+https://www.hostinger.es/tutoriales/como-instalar-y-usar-docker-en-ubuntu
+https://docs.docker.com/config/containers/resource_constraints/
+https://stackoverflow.com/questions/48957195/how-to-fix-docker-got-permission-denied-issue
+
+wsl --unregister Ubuntu-20.04
+############################# INSTALACION WSL2 ############################
+
+->hablitar características de widnows subsistema de linux para windows y plataforma de maquinas virtuales
+
+abrir powershell como admin:
+
+esta linea habilita el subsistema de linux para windows:
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+
+esta linea habilita la plataforma de maquina virtual:
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+
+reiniciar el equipo
+
+https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi --> descargar y ejecutar como admin
+
+wsl --set-default-version 2
+wsl -l -v
+
+wsl --list --online
+wsl --install -d Ubuntu-20.04
+wsl --set-version Ubuntu-20.04 2
+wsl -l -v
+
+
+wsl.exe --shutdown
+wsl.exe --update
+exit
+
+
+\\wsl$  ---> ubicación en windows de donde está la unidad montada con ubuntu
+-------------------------------------------------------------------------------------
+Crear en el acceso rapido de windows un archivo llamado ".wslconfig" y añadir:
+ubicar el archivo en C:\Users\<you_user>\.wslconfig.
+
+------------
+[wls2]
+memory=48GB
+processors=8
+------------
+
+
+estas son más opciones de config
+[wsl2]
+kernel=              # An absolute Windows path to a custom Linux kernel.
+memory=              # How much memory to assign to the WSL2 VM.
+processors=          # How many processors to assign to the WSL2 VM.
+swap=                # How much swap space to add to the WSL2 VM. 0 for no swap file.
+swapFile=            # An absolute Windows path to the swap vhd.
+localhostForwarding= # Boolean specifying if ports bound to wildcard or localhost in the WSL2 VM should be connectable from the host via localhost:port (default true).
+
+-------------------------------------------------------------------------------------
+############################# PARA HACER MÁS ROBUSTO EL ENTORNO ############################
+
+sudo apt-get update -y && sudo apt-get upgrade -y
+sudo apt install neofetch -y
+sudo apt-get install build-essential cmake libopenblas-dev libblas-dev m4 python3-dev python3-yaml python3-setuptools manpages-dev
+
+neofetch ---> chechear los recursos del wsl2
+nvidia-smi ---> chechear los recursos nvidia
+############################# CUDA ############################
+
+sudo apt-key del 7fa2af80
+
+wget https://developer.download.nvidia.com/compute/cuda/11.2.0/local_installers/cuda_11.2.0_460.27.04_linux.run
+sudo sh cuda_11.2.0_460.27.04_linux.run    ----> con la version de ubuntu 22.04 falla en este punto el compilador gcc, RECOMENDADO USAR LA VERSION 20.04
+
+############################# cuDNN ############################
+
+https://developer.nvidia.com/compute/machine-learning/cudnn/secure/8.1.0.77/11.2_20210127/cudnn-11.2-linux-x64-v8.1.0.77.tgz   ---> descargar en el escritorio de windows
+cd /mnt/c/Users/<your_user>/Desktop
+
+sudo tar -xvzf cudnn-11.2-linux-x64-v8.1.0.77.tgz
+
+sudo cp cuda/include/cudnn.h /usr/local/cuda/include/
+sudo cp cuda/lib64/libcudnn* /usr/local/cuda/lib64/
+
+
+sudo chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn*
+
+
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda/include:$LD_LIBRARY_PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64' >> ~/.bashrc
+
+source ~/.bashrc
+
+############################# MINICONDA ############################
+
+abrir nuevo ternimnal para instalarlo, no cerrar el otro
+bash Miniconda3-latest-Linux-x86_64.sh
+
+echo ". /home/amoreno/miniconda3/etc/profile.d/conda.sh" >> ~/.bashrc
+source ~/.bashrc
+
+conda init
+
+conda config --set auto_activate_base false
+conda config --set auto_activate_base true
+
+############################# ENTORNO TENSORFLOW-GPU ############################
+
+conda create -n tf-wsl2-gpu python=3.8
+
+pip install tensorflow==2.7.0
+pip install pandas==1.3.5
+pip install openpyxl==3.0.9
+pip install numpy==1.19.5   
+pip install jupyter==1.0.0
+pip install protobuf==3.20.*
+
+
+
+############################# ENTORNO TORCH-GPU ############################
+
+conda create -n torch-wsl2-gpu python=3.8
+
+->  pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
+conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
+pip install pandas==1.3.5
+pip install openpyxl==3.0.9
+pip install opencv-python==4.5.4.60
+pip install matplotlib==3.5.1
+pip install tqdm==4.64.1
+pip install seaborn==0.11.2
+pip install numpy==1.19.5       
+pip install easyocr==1.6.2
+pip install jupyter==1.0.0
+pip install protobuf==3.20.*
+pip install tensorboard==2.11.0
+
+
+############################# DOCKER ############################
+-> https://docs.docker.com/engine/install/ubuntu/
+sudo apt-get remove docker docker-engine docker.io containerd runc
+
+sudo apt-get -y install apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt update
+apt-cache policy docker-ce
+
+# Install Docker, you can ignore the warning from Docker about using WSL
+sudo apt install docker-ce
+
+sudo systemctl status docker
+
+# Add your user to the Docker group
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Install Docker Compose v2
+sudo apt-get update && sudo apt-get install docker-compose-plugin
+
+# Using Ubuntu 22.04 or Debian 10 / 11? You need to do 1 extra step for iptables
+# compatibility, you'll want to choose option (1) from the prompt to use iptables-legacy.
+sudo update-alternatives --config iptables
+------------------------------------------------------------------------------------------
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+      && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+      && curl -s -L https://nvidia.github.io/libnvidia-container/experimental/$distribution/libnvidia-container.list | \
+         sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+         sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+sudo apt-get update
+sudo apt-get install -y nvidia-docker2
+sudo systemctl restart docker
+
+sudo service docker stop
+sudo service docker start
+
+
+sudo docker run --rm --gpus all nvidia/cuda:11.6.2-base-ubuntu20.04 nvidia-smi
+docker run -it --gpus all -p 8888:8888 tensorflow/tensorflow:latest-gpu-py3-jupyter
+
+############################# DOCKERFILE ############################
+example
+FROM tensorflow/tensorflow:lastet-gpu
+
+WORKDIR /tf-knugs
+
+COPY requirements.txt requirements.txt
+
+RUN pip install -r requirements.txt
+
+EXPOSE 8888
+
+############################# DOCKERCOMPOSE ############################
+
+version: '1.0'
+services:
+ jupyter-lab:
+  build:.
+  ports:
+   - 8888:8888
+  volumes:
+   - /tf-knugs:/tf-knugs
+  deploy:
+   resources:
+    reservation:
+     devices:
+      - driver: nvidia
+      count:1
+      capabilities: [gpu]
